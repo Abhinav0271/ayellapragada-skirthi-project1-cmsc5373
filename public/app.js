@@ -1,18 +1,25 @@
-const b1= document.getElementById('buttonNumber');
-const b2= document.getElementById('buttonName');
-const rootEl = document.getElementById('root');
+import { attachAuthStateChangeObserver } from "./controller/firebase_auth.js";
+import { HomeMenu, Menu2Menu, SignoutMenu } from "./controller/menueventhandlers.js";
+import { routing } from "./controller/route_controller.js";
 
-b1.onclick = function (){
-    let r1= Math.random();
-    let n1 = Math.floor(r1*100);
 
-    let r2 = Math.random();
-    let n2= Math.floor(r2*100);
+document.getElementById('menu-home').onclick= HomeMenu;
+document.getElementById('menu-menu2').onclick= Menu2Menu;
+document.getElementById('menu-signout').onclick = SignoutMenu;
 
-    rootEl.innerHTML= 'Your lucky numbers are ' + n1 + ' and ' + n2;
+attachAuthStateChangeObserver();
 
+window.onload= function(e){
+    const pathname = window.location.pathname;
+    const hash= window.location.hash;
+    console.log(pathname, hash);
+    routing(pathname, hash); 
 }
 
-b2.onclick = function (){
-    rootEl.innerHTML = 'My name is <b>ABHINAV<b/>';
+window.onpopstate = function(e){
+    e.preventDefault();
+    const pathname = window.location.pathname;
+    const hash= window.location.hash;
+    routing (pathname, hash);
 }
+
