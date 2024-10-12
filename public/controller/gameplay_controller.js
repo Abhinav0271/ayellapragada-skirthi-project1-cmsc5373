@@ -30,6 +30,7 @@ export const gameplayController = {
         dice_winning_shape.textContent = diceResult;
         balanceDisplay.textContent = `$${newBalance}`;
         diceResultDisplay.innerHTML = message || "No bet placed.";
+        gameState.setDefaultMsg = message;
     },
      rollDice :() => {
         let diceValue = Math.floor(Math.random() * 6) + 1; 
@@ -42,11 +43,34 @@ export const gameplayController = {
         const oddEvenAmount = gameState.oddEvenAmount;
         const rangeBet = gameState.rangeBet;
         const rangeAmount = gameState.rangeAmount;
+        const oddInput = document.getElementById('odd');
+        const evenInput = document.getElementById('even');
+    
+        // Ensure the elements exist before accessing the 'checked' property
+        if (oddInput && gameState.oddselected) {
+            oddInput.checked = true;
+        } else if (evenInput && gameState.evenselected) {
+            evenInput.checked = true;
+        }
+        if(gameState.odddisabled){
+            oddInput.disabled = true;
+        }
+        if(gameState.evendisabled){
+            evenInput.disabled = true;
+        }
 
-        if (gameState.oddselected) {
-            document.getElementById('odd').checked = true;
-        } else if (gameState.evenselected) {
-            document.getElementById('even').checked = true;
+        if(gameState.defMsg){
+            document.getElementById('dice-result').innerHTML = gameState.defMsg
+        }
+
+        if(gameState.playbtn){
+            document.getElementById('play-button').enabled= true;
+        }
+        if(gameState.newGamebtn){
+            document.getElementById('new-game-button').enabled= true;
+        }
+        else{
+            document.getElementById('new-game-button').disabled= true
         }
 
         if (oddEvenBet) {
@@ -68,9 +92,40 @@ export const gameplayController = {
         } else if (gameState.range3selected) {
             document.getElementById('range3').checked = true;
         }
-        if(gameState.inPlay){
-            document.getElementById('play-button').disabled = false;
+        if(gameState.range1disabled){
+            document.getElementById('range1').disabled =  true;
         }
+        if(gameState.range2disabled){
+            document.getElementById('range2').disabled =  true;
+        }
+        if(gameState.range3disabled){
+            document.getElementById('range3').disabled =  true;
+        }
+        if(gameState.evendisabled){
+            evenInput.disabled = true;
+        }
+
+        const oddEvenBets = document.getElementsByName('oddEvenBet');
+        const rangeBets = document.getElementsByName('rangeBet');
+        const oddEvenBetSelected = oddEvenBetAmount.value !== 'Select a bet amount' && oddEvenBetAmount.value !== '0';
+        const rangeBetSelected = rangeBetAmount.value !== 'Select a bet amount' && rangeBetAmount.value !== '0';
+        const oddEvenRadioSelected = Array.from(oddEvenBets).some(radio => radio.checked);
+        const rangeRadioSelected = Array.from(rangeBets).some(radio => radio.checked);
+        
+
+        if((oddEvenBetSelected && (oddEvenRadioSelected || rangeRadioSelected)) ||
+                (rangeBetSelected && (oddEvenRadioSelected || rangeRadioSelected)) ){
+                    if(!(gameState.odddisabled)){
+                    document.getElementById('play-button').disabled= false;
+                     }
+                     else{
+                        document.getElementById('play-button').disabled= true; 
+                     }
+
+        }
+        document.getElementById('dice-result').innerHTML = gameState.defMsg
+        console.log((gameState.historycleared));
+        
     },
 
     async playGame(oddEvenBet, oddEvenAmount, rangeBet, rangeAmount, balance, updateView,diceValue) {
@@ -128,9 +183,8 @@ export const gameplayController = {
         } else {
             message += "No Bets Placed on range " + (rangeBet ? rangeBet : '');
         }
-        document.getElementById('winnn').innerText = "previous balance"+balance;
+
         balance += winnings
-        document.getElementById('winnn').innerText += "winnings:"+winnings+"total balance after win:"+balance;
         gameState.setBalance(balance); 
 
        try {
@@ -151,7 +205,7 @@ export const gameplayController = {
         console.error("Error saving game history to Firestore: ", error);
     }
 
-
+        gameState.setDefaultMsg(message);
         // update the view with the results
         gameplayController.updateView(diceResult, message, balance);
     },
@@ -188,26 +242,33 @@ export const gameplayController = {
 
         const disableInputs = () => {
             playButton.disabled = true;
+            gameState.setPlayBtn(false);
+
             oddEvenBetAmount.disabled = true;
             rangeBetAmount.disabled = true;
             newGameButton.disabled = false;
+            gameState.setNewGamebtn(true);
             oddEvenBets.forEach(radio => {
                 radio.disabled = true;
             });
+            gameState.setoddselected(false);
+            gameState.setEvenselected(false);
+
+            gameState.setevendisabled(true);
+            gameState.setodddisabled(true);
 
             rangeBets.forEach(radio => {
                 radio.disabled = true;
             });
-
+            gameState.setRange1Selected(false);
+            gameState.setRange2Selected(false);
+            gameState.setRange3Selected(false);
+            
+            gameState.setRange1Disabled(true);
+            gameState.setRange2Disabled(true);
+            gameState.setRange3Disabled(true);
         };
-        // showKeySwitch.addEventListener("change", (e) => {
-        //     if (e.target.checked) {
-        //         gameKey.textContent = gameplayController.rollDice();
-        //         gameKeyDisplay.style.display = "block"; 
-        //     } else {
-        //         gameKeyDisplay.style.display = "none"; 
-        //     }
-        // });
+        
         newGameButton.addEventListener('click', () => {
             newGameButton.disabled=true;
             diceResultDisplay.textContent = 'Choose bet(s) and press [PLAY]';
@@ -244,6 +305,7 @@ export const gameplayController = {
 
         oddEvenBetAmount.addEventListener('change', (e) => {
             validateBets();
+            
 
             const oddEvenAmount = parseInt(e.target.value, 10)
             gameState.setoddEvenAmount(parseInt(oddEvenAmount));
@@ -261,6 +323,7 @@ export const gameplayController = {
 
         document.getElementById('odd').addEventListener('change', (e) => {
             if (e.target.checked) {
+                gameplayController.setupBetValidation();
                 gameState.setoddselected(true);  // Call the correct method
                 gameState.setEvenselected(false); // Unselect the other radio
                 gameState.setOddEvenBet('odd');
@@ -269,6 +332,7 @@ export const gameplayController = {
 
         document.getElementById('even').addEventListener('change', (e) => {
             if (e.target.checked) {
+                gameplayController.setupBetValidation();
                 gameState.setoddselected(false);
                 gameState.setEvenselected(true);
                 gameState.setOddEvenBet('even');

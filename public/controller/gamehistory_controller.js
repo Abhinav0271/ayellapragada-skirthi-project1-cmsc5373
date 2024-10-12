@@ -98,7 +98,7 @@ export const gamehistoryController = {
             gameState.setBalance(100);
             gameState.setoddselected(true);
             gameState.setRange1Selected(true);
-            gameplayController.restoreSelections();
+            gameState.sethistorycleared(true);
         } catch (error) {
             console.error("Error clearing game history:", error);
         }

@@ -2,15 +2,27 @@ export const gameState = {
     balance: 100,
     oddEvenBet: null,
     oddselected:false,
+    evendisabled:false,
+    odddisabled:false,
     evenselected:false,
     oddEvenAmount: 0,
+    oddEvenAmountdisabled:false,
     rangeBet: null,
     rangeAmount: 0,
     diceValue: null,
     range1selected: false,
+    range1disabled: false,
     range2selected: false,
+    trange2disabled:false,
     range3selected: false,
+    range3disabled:false, 
     inPlay:false,
+    newGamebtn:false,
+    playbtn:false,
+    showcheatkey:true,
+    historycleared:false,
+
+    defMsg:'Choose bet(s) and press [PLAY]',
 
     setBalance(newBalance) {
         this.balance = newBalance;
@@ -18,8 +30,14 @@ export const gameState = {
     setoddselected(selected){
         this.oddselected= selected
     },
+    setodddisabled(selected){
+        this.odddisabled= selected
+    },
     setEvenselected(selected){
         this.evenselected= selected
+    },
+    setevendisabled(selected){
+        this.even= selected
     },
 
     setOddEvenBet(bet, amount) {
@@ -34,6 +52,16 @@ export const gameState = {
     },
     setRange3Selected(selected) {
         this.range3selected = selected;
+    },
+
+    setRange1Disabled(selected) {
+        this.range1disabled = selected;
+    },
+    setRange2Disabled(selected) {
+        this.range2disabled = selected;
+    },
+    setRange3Disabled(selected) {
+        this.range3disabled = selected;
     },
     setRangeBet(bet, amount) {
         this.rangeBet = bet;
@@ -55,6 +83,25 @@ export const gameState = {
     setInPlay(selected){
         this.inPlay = selected;
     },
+    setNewGamebtn(selected){
+        this.newGamebtn = selected;
+    },
+    getNewGamebtn(){
+        return this.newGamebtn;
+    },
+    setPlayBtn(selected){
+        this.playbtn = selected;
+    },
+    setDefaultMsg(msg){
+        this.defMsg = msg;
+    },
+    sethistorycleared(selected){
+        this.historycleared = selected;
+    },
+    getPlaybtn(){
+        return this.playbtn;
+    },
+
     resetGame() {
         this.oddEvenBet = null;
         this.oddEvenAmount = 0;

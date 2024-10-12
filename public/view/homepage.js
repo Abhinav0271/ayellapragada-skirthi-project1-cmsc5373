@@ -29,10 +29,7 @@ export async function homepage(){
     const showKeySwitch = divWrapper.querySelector("#showKeySwitch"); 
     const gameKeyDisplay = divWrapper.querySelector("#gameKeyDisplay");  
     const gameKey = divWrapper.querySelector("#gameKey");
-    newGameButton.disabled = true;
-
-    gameplayController.restoreSelections();
-   
+    
 
     let diceValue = null;
 
